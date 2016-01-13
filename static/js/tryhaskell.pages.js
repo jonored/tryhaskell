@@ -24,11 +24,46 @@ tryhaskell.nemesis = "chirs";
 // All pages
 tryhaskell.pages.list =
     [
-        {title:'Got five minutes?',
+    	{lesson:-1,
+	 title:'Examples!',
+	 guide:
+	 '<div class="indent">' +
+	 '<h3>Examples!</h3>' +
+	 '<p>Click any example to insert into the input; hit enter in the input to run it.</p>' +
+	 '<p><code class="clicky">next</code> and <code class="clicky">back</code> will advance through the help files.' +
+	 '<ul>' +
+	 '<li>Basic anagram: <code class="clicky">anagram sysDict "aachinopr"</code></li>' +
+	 '<li>Anagram with unknowns: <code class="clicky">anagram sysDict "aachino??"</code></li>' +
+	 '<li>Crossword (in-order, unknowns):<code class="clicky">crossword sysDict "??f??"</code></li>' +
+	 '<li>Crossword with globs (match any number of any characters): <code class="clicky">crossword sysDict "a*ialist"</code></li>' +
+	 '<li>Require use of all letters for anagram (default is half): <code>anagramFull sysDict "aeelmpx"</code></li>' +
+	 '<li>Require at least 6 letters: <code>anagramMin sysDict "aeelmpx" 5</code></li>' +
+	 '<li>Return all possible words, longest first: <code>anagramAny sysDict "aeelmpx"</code></li>' +
+	 '<li>rot13: <code>Cipher.rot 13 "aeelmpx"</code></li>' +
+	 '</ul>' +
+	 '<p>In general, any haskell code that <a href="http://tryhaskell.org/">tryhaskell.org</a> will accept will work here; the anagram and crossword functions return plain lists of strings. There are some examples of fancy queries on the <code>next</code> page.</p>' +
+	 '</div>'
+	},
+    	{lesson:1.5,
+	 title:'Fancypants Examples!',
+	 guide:
+	 '<div class="indent">' +
+	 '<h3>Fancypants Examples!</h3>' +
+	 '<ul>' +
+	 '<li>Filter with a regex after: <code class="clicky"> filter (=~"[hid][rae][bon]d") $ anagram sysDict "dha?"</code><sup>*</sup></li>' +
+	 '<li>Filter with some weirder constraint (in this case, "is a palindrome", given five-letter words with fourth letter "a"): <code class="clicky">filter (\\a->a==reverse a) $ crossword sysDict "???a?"</code></li>' +
+	 '<li>Count the results, rather than showing them: <code class="clicky">length $ filter (\\a->a==reverse a) $ crossword sysDict "?????"</code></li>' +
+	 '</ul>' +
+	 '<p>Regex is provided by Text.Regex.TDFA. Packages can be added to the usable set on request.</p>' +
+	 '<div class="well .small"><small><sup>*</sup>&nbsp;&nbsp;What\'s up with the <code>$</code>? - haskell separates arguments with whitespace, rather than with parentheses and commas. The <code>$</code> means "everything to the right is a single argument, even things with <code>$</code> in them". Thinking about it as a backwards sort of unix pipe is not far off. So in the count example above, we\'re passing the <code>length</code> function the result of the (two-argument) <code>filter</code> function on a predicate and the result of the call to <code>crossword</code>. If you\'re trying to do some complex query and getting hung up, please do ask for help!</small></div>' +
+	 '</div>'
+	},
+        {lesson:0,
+	 title:'Got five minutes?',
          guide:
          '<div class="indent">' +
          '<h3>Got 5 minutes?</h3>' +
-         '<p>Type <code title="Click me to insert &quot;help&quot; into the console." style="cursor: pointer;">help</code> to start the ' +
+         '<p>Type <code title="Click me to insert &quot;help&quot; into the console." style="cursor: pointer;">next</code> to start the ' +
          'tutorial.</p>' +
          '<p>Or try typing these out and see what happens ' +
          '<small class="note">(click to insert)</small>:</p>' +
@@ -44,6 +79,7 @@ tryhaskell.pages.list =
          'web apps, and lots more in <a href="https://www.fpcomplete.com/page/project-build">an online IDE</a>. See also the <a href="https://www.fpcomplete.com/school">school of Haskell</a> for practical tutorials.' +
          '</p>' +
          '</div>' +
+	 '<div class="well .small"><small> We\'ve run off the end of the puzzle-specific docs; This is the tutorial from <a href="http://tryhaskell.org">tryhaskell.org</a>.</div>' +
          '</div>'
         },
         ////////////////////////////////////////////////////////////////////////

@@ -49,6 +49,11 @@ library
                    , time
                    , unordered-containers
                    , lrucache
+                   , json
+                   , regex-tdfa
+                   , hunttools
+                   , unix
+                   , hint
 
 executable tryhaskell
   hs-source-dirs:    src/main

@@ -1,7 +1,11 @@
-resolver: lts-3.15
+resolver: lts-4.1
 packages:
 - .
+- ../mueval
+- ../../hunttools
 extra-deps:
 - blaze-0.0.2
+- packed-dawg-0.2.0.8
+- show-0.6
 flags: {}
 extra-package-dbs: []

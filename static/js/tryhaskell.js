@@ -71,7 +71,7 @@ tryhaskell.preCommandHook = function(line,report){
         report();
         return true;
     } else if (line.trim() == 'help') {
-        tryhaskell.setPage(2,null);
+        tryhaskell.setPage(1,null);
         report();
         return true;
     }
@@ -96,10 +96,16 @@ tryhaskell.makeController = function(){
                 tryhaskell.ajaxCommand(tryhaskell.io,report,tryhaskell.stdin);
             }
         },
+	completeIssuer: function(promptText){
+	    var lastWord = promptText.split(" ").pop();
+	    tryhaskell.controller.showCompletion(promptText, ["crossword", "anagram", "sysDict"].filter(
+	    	function(elem, idx, arr){  return lastWord == '' || elem.substring(0,lastWord.length) == lastWord; }
+	    ).map(function(elem, idx, arr){return elem.substring(lastWord.length);}));
+	},
         autofocus: true,
         animateScroll: true,
         promptHistory: true,
-        welcomeMessage: 'Type Haskell expressions in here.',
+        welcomeMessage: 'Type commands in here. Hit tab for the completion list.',
         continuedPromptLabel: '> '
     });
 };
@@ -110,7 +116,7 @@ tryhaskell.ajaxCommand = function(line,report,stdin){
                  'args': JSON.stringify([stdin,tryhaskell.files])
                };
     $.ajax({
-        url: '/eval',
+        url: 'hunthask/eval',
         dataType: 'json',
         type: 'POST',
         data: args,
@@ -165,8 +171,10 @@ tryhaskell.makeGuide = function(){
     var match = window.location.href.match(/#step([0-9]+)$/);
     if(match){
         tryhaskell.setPage(match[1]*1,null);
+    } else if(!window.location.href.match(/#/)) {
+    	tryhaskell.setPage(1,null);
     } else {
-        tryhaskell.setPage(1,null);
+        tryhaskell.setPage(-1,null);
     }
 };
 
@@ -176,11 +184,15 @@ tryhaskell.setPage = function(n,result){
     if(page){
         // Update the current page content
         var guide = $('#guide');
-        guide.html(typeof page.guide == 'string'? page.guide : page.guide(result));
+	guide.removeClass('hidden');
+	$('#console').removeClass('span12').addClass('span6');
+        guide.html(
+	 '<button type="button" style="padding-right: 1em;" class="close" aria-label="Close" onclick="tryhaskell.setPage(-1);"><span aria-hidden="true">&times;</span></button>' +
+         (typeof page.guide == 'string'? page.guide : page.guide(result)));
         tryhaskell.makeGuidSamplesClickable();
         // Update the location anchor
         if (tryhaskell.currentPage != null)
-            window.location = '/#step' + n;
+            window.location = '/hunthask/#step' + n;
         tryhaskell.currentPage = n;
         // Setup a hook for the next page
         var nextPage = tryhaskell.pages.list[n];
@@ -192,7 +204,9 @@ tryhaskell.setPage = function(n,result){
             };
         }
     } else {
-        throw "Unknown page number: " + n;
+    	$('#guide').addClass('hidden');
+	$('#console').removeClass('span6').addClass('span12');
+//        throw "Unknown page number: " + n;
     }
 };
 
@@ -238,7 +252,7 @@ tryhaskell.activeUsers = function(){
     var color_cache = {};
     function update(){
         if(!$('.active-users').is(':visible')) return;
-        $.get('/users',function(users){
+        $.get('/hunthask/users',function(users){
             users = JSON.parse(users);
             $('.active-users .user').remove();
             var color;

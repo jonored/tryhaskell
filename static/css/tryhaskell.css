@@ -1,6 +1,7 @@
 body {
   background: #f7f7f7;
   font-family: 'Merriweather';
+  height: 100%;
 }
 /* Fonts */
 @font-face {
@@ -47,6 +48,13 @@ body {
   border-top: 1px solid #eee;
   border-bottom: 1px solid #eee;
 }
+.fullpaged {
+  position: absolute;
+  top: 7em;
+  bottom: 5em;
+  left: 1em;
+  right: 1em;
+}
 #console {
   font-family: "ubuntu mono",monospace;
 }
@@ -59,7 +67,7 @@ body {
   font-weight:bold
 }
 .jquery-console-inner {
-  height: 20em;
+  height: 100%;
   overflow: auto;
   word-wrap: break-word;
 }
@@ -83,10 +91,19 @@ body {
   color: #888;
   margin-bottom: 0.5em;
 }
+.jquery-console-message-value {
+  color: #216f42;
+}
 /* Footer */
 footer {
+  position:absolute;
+  bottom:0;
   margin-top: 2em;
   margin-bottom: 2em;
+}
+#guide {
+  height: 100%;
+  overflow: auto;
 }
 #guide h3 {
   margin-top: 0;
@@ -98,6 +115,30 @@ footer {
 #guide .spoiler:hover {
   color: #d14;
 }
+
+.hidden {
+	display: none;
+}
+
+.help {
+	float: right;
+/*	padding: 1em;
+	text-align: right;
+  margin: 1em;
+  font-size: 2em;
+  color: #2e659c;*/
+  margin: 1em;
+  font-size: 2em;
+  font-family: 'Haskell';
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+}
+
 @media (max-width: 767px){
   .console {
     padding: 2em 2em 2em 2em;

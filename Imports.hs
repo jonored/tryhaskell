@@ -1,10 +1,11 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Imports where
 
 import           Control.Applicative
 import           Control.Arrow
 import           Control.Monad
 import           Control.Monad.Cont
-import           Control.Monad.Error
+import           Control.Monad.Except
 import           Control.Monad.Fix
 import           Control.Monad.Identity
 import           Control.Monad.RWS
@@ -37,12 +38,25 @@ import           Data.Word
 import           Debug.SimpleReflect
 import           Prelude hiding (IO,putStr,putStrLn,getLine,readLn,print,readIO,readFile,writeFile,appendFile)
 import           PureIO as IO
-import           ShowFun
+--import           ShowFun
 import           System.Random
 import           Test.QuickCheck
 import           Text.JSON
 import           Text.PrettyPrint.HughesPJ
 import           Text.Printf
+import           Crossword
+import           Anagram
+import           StandardDictionaries
+import           Dictionary
+import           Text.Regex.TDFA
+import           HuntTools
+import           Lucid
+import           Lucid.Bootstrap
+import qualified Cipher
+squiggle = "SQUIGGLE"
+
+--anagram dict = doAnagram $ anaDict dict
+--crossword dict = doCrossword $ crossDict dict
 
 -- | Run the given command and then show the output. This constraint
 -- is to aid communication between mueval and tryhaskell.
@@ -56,3 +70,15 @@ runTryHaskellIO (is,fs) m =
     (Left i,out) -> Left (i,convert out)
     (Right r,out) -> Right (show r,convert out)
   where convert (Output os fs) = (os,M.toList fs)
+
+
+class FancyResult a where
+  doFancy :: a -> IO ()
+
+
+data SimpleFancy = SimpleFancy
+
+instance (FancyResult SimpleFancy) where
+  doFancy SimpleFancy = putStr "I. Am. Fancy."
+
+
