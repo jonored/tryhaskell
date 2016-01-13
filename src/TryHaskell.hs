@@ -51,6 +51,7 @@ import           System.Process.Text.Lazy
 data EvalResult
   = ErrorResult !Text
   | SuccessResult !(Text,Text,Text) ![Text] !(Map FilePath String)
+  | FancyResult !(Text, Text, Text, Text) ![Text] !(Map FilePath String)
   | GetInputResult ![Text] !(Map FilePath String)
   deriving (Show,Eq)
 
