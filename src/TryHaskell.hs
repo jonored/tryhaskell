@@ -51,6 +51,7 @@ import           System.Process.Text.Lazy
 data EvalResult
   = ErrorResult !Text
   | SuccessResult !(Text,Text,Text) ![Text] !(Map FilePath String)
+  | FancyResult !(Text, Text, Text, Text) ![Text] !(Map FilePath String)
   | GetInputResult ![Text] !(Map FilePath String)
   deriving (Show,Eq)
 
@@ -81,7 +82,7 @@ startServer cache stats =
            lookup "PORT" env
      let config =
            setPort port .
-           setAccessLog ConfigNoLog .
+           setAccessLog (ConfigFileLog "/tmp/tryhaskellAccess.log") .
            setErrorLog ConfigNoLog .
            setVerbose False
      httpServe (config defaultConfig)
@@ -105,6 +106,7 @@ dispatch :: FilePath -> Cache -> MVar Stats -> Snap ()
 dispatch static cache stats =
   route [("/static",serveDirectory static)
         ,("/eval",eval cache stats)
+        ,("/hunthask/eval",eval cache stats)
         ,("/users",users stats)
         ,("/",home stats)]
 
@@ -219,7 +221,15 @@ muevalToJson ex is fs =
                                 ,("type"   .= typ)
                                 ,("stdout" .= stdouts)
                                 ,("files"  .= files)])]
-               GetInputResult stdouts files ->
+               FancyResult (expr, typ, value', htmlValue) stdouts files ->
+	         [("success" .=
+                   Aeson.object [("value"  .= value')
+                                ,("html"   .= htmlValue)
+                                ,("expr"   .= expr)
+                                ,("type"   .= typ)
+                                ,("stdout" .= stdouts)
+                                ,("files"  .= files)])]
+	       GetInputResult stdouts files ->
                  [("stdout" .= stdouts)
                  ,("files" .= files)])
 
@@ -232,6 +242,12 @@ toLazy = fromChunks . return
 -- expression.
 muevalOrType :: String -> [String] -> Map FilePath String -> IO EvalResult
 muevalOrType e is fs =
+  do canFancy <- mueval True $ "doFancy (" ++ e ++ ")"
+     case canFancy of
+       Left _ -> muevalOrTypeInner e is fs
+       Right _ -> muevalOrTypeInner ("doFancy (" ++ e ++ ")") is fs
+
+muevalOrTypeInner e is fs =
   do typeResult <- mueval True e
      case typeResult of
        Left err ->
@@ -332,10 +348,10 @@ home stats =
           (html_ (do head_ headContent
                      body_ bodyContent)))
   where headContent =
-          do title_ "Try Haskell! An interactive tutorial in your browser"
+          do title_ "HuntRepl - an interactive hunt tools interface"
              meta_ [charset_ "utf-8"]
              css "//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css"
-             css "/static/css/tryhaskell.css"
+             css "/hunthask/static/css/tryhaskell.css"
              css "//fonts.googleapis.com/css?family=Merriweather"
         css url =
           link_ [rel_ "stylesheet",type_ "text/css",href_ url]
@@ -345,6 +361,7 @@ bodyContent :: Html ()
 bodyContent =
   do container_
        (row_ (span12_ (do bodyUsers
+                          helpLink
                           bodyHeader)))
      warningArea
      consoleArea
@@ -361,9 +378,11 @@ bodyUsers =
 bodyHeader :: Html ()
 bodyHeader =
   div_ [class_ "haskell-icon-container"]
-       (a_ [href_ "/"]
-           (table_ (tr_ (do td_ (p_ [class_ "haskell-icon"] mempty)
-                            td_ [class_ "try-haskell"] "Try Haskell"))))
+       (a_ [href_ "/hunthask/"]
+         (table_ (tr_ (do td_ (p_ [class_ "haskell-icon"] mempty)
+                          td_ [class_ "try-haskell"] "RTC Hunt REPL"))))
+
+helpLink = (button_ [onclick_ "tryhaskell.setPage(1);", class_ "help button btn-info"] "Help!")
 
 -- | An area for warnings (e.g. cookie warning)
 warningArea :: Html ()
@@ -380,10 +399,10 @@ warningArea =
 -- | The white area in the middle.
 consoleArea :: Html ()
 consoleArea =
-  div_ [class_ "console"]
+  div_ [class_ "console fullpaged"]
        (container_
-          (row_ (do span6_ [id_ "console"] mempty
-                    span6_ [id_ "guide"] mempty)))
+          (row_ (do span12_ [id_ "console"] mempty
+                    span6_ [id_ "guide", class_ "hidden"] mempty)))
 
 -- | The footer with links and such.
 bodyFooter :: Html ()
@@ -405,9 +424,9 @@ bodyFooter =
 scripts :: Html ()
 scripts =
   do script_ [src_ "//code.jquery.com/jquery-2.0.3.min.js"] ""
-     script_ [src_ "/static/js/jquery.console.js"] ""
-     script_ [src_ "/static/js/tryhaskell.js"] ""
-     script_ [src_ "/static/js/tryhaskell.pages.js"] ""
+     script_ [src_ "/hunthask/static/js/jquery.console.js"] ""
+     script_ [src_ "/hunthask/static/js/tryhaskell.js"] ""
+     script_ [src_ "/hunthask/static/js/tryhaskell.pages.js"] ""
      script_ "var gaJsHost = ((\"https:\" == document.location.protocol) ? \"https://ssl.\" : \"http://www.\");\
               \document.write(unescape(\"%3Cscript src='\" + gaJsHost + \"google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E\"));"
      script_ "try {\
