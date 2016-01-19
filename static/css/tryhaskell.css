@@ -58,7 +58,7 @@ body {
 #console {
   font-family: "ubuntu mono",monospace;
 }
-.jquery-console-nofocus {
+.jquery-console-nofocus .jquery-console-prompt-box {
   opacity: 0.8;
 }
 .jquery-console-focus .jquery-console-cursor {
@@ -74,6 +74,8 @@ body {
 .jquery-console-prompt-label {
   color: #8f4e8b;
   font-weight: bold;
+  float: left;
+  width: 2em;
 }
 .jquery-console-error {
   color: #8f4e8b;

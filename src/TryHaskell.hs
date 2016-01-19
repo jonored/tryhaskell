@@ -280,8 +280,8 @@ muevalIO e is fs =
          return (ErrorResult err)
        Right (_,_,readMay . T.unpack -> Just r) ->
          ioResult e (bimap (second oconvert) (second oconvert) r)
-       _ ->
-         return (ErrorResult "Problem running IO.")
+       q ->
+         return (ErrorResult $ T.pack $ "Problem running IO." ++ (show q))
   where convert (Input os fs') = (os,Map.toList fs')
         oconvert (os,fs') = Output os (Map.fromList fs')
 
@@ -352,6 +352,7 @@ home stats =
              meta_ [charset_ "utf-8"]
              css "//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css"
              css "/hunthask/static/css/tryhaskell.css"
+             css "/hunthask/static/css/richconsole.css"
              css "//fonts.googleapis.com/css?family=Merriweather"
         css url =
           link_ [rel_ "stylesheet",type_ "text/css",href_ url]

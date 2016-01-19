@@ -255,10 +255,14 @@
 
     ////////////////////////////////////////////////////////////////////////
     // Handle setting focus
-    container.click(function(){
+    container.click(function(e){
       // Don't mess with the focus if there is an active selection
       if (window.getSelection().toString()) {
 	return false;
+      }
+
+      if ($(e.target).parents(".fancy_box").length) {
+        return true;
       }
 
       inner.addClass('jquery-console-focus');
@@ -770,7 +774,13 @@
     extern.promptText = function(text){
       if (typeof text === 'string') {
 	promptText = text;
-	column = promptText.length;
+	column = promptText.indexOf("…");
+	if(column<=0) {
+		column = promptText.length;
+	} else {
+		deleteCharAtPos();
+	}
+
 	updatePromptDisplay();
       }
       return promptText;

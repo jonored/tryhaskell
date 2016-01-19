@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings, FlexibleInstances #-}
 module Imports where
 
 import           Control.Applicative
@@ -52,7 +52,11 @@ import           Text.Regex.TDFA
 import           HuntTools
 import           Lucid
 import           Lucid.Bootstrap
+import qualified Data.Text.Lazy as LT
+import qualified Data.Text as T
 import qualified Cipher
+
+import qualified Data.DAWG.Packed64 as DAWG
 squiggle = "SQUIGGLE"
 
 --anagram dict = doAnagram $ anaDict dict
@@ -79,6 +83,32 @@ class FancyResult a where
 data SimpleFancy = SimpleFancy
 
 instance (FancyResult SimpleFancy) where
-  doFancy SimpleFancy = putStr "I. Am. Fancy."
+  doFancy SimpleFancy = putStr $ LT.unpack $ renderText $ do div_ [class_ "well"] "I. Am. Fancy."
+
+
+htmlWord :: String -> Html ()
+htmlWord word = div_ [class_ "word"] $ do
+    toHtml word
+    span_ [class_ "tools ", role_ "group"] $ do
+      span_ [class_ "hideIfNotAnagram"] $ do
+        a_ [class_ "", onclick_ "batshitAnagram(this);"] "Choose"
+      toolLink "Wiktionary" "http://en.wiktionary.org/wiki/"
+      toolLink "Wikipedia" "http://en.wikipedia.org/wiki/"
+      toolLink "Google" "http://www.google.com/search?q="
+  where toolLink name url = (a_ [class_ "",target_ "_blank", href_ $ T.pack (url ++ word)] name) :: Html ()
+
+
+
+--instance (FancyResult AnagramResult) where
+--  doFancy (AnagramResult hist )
+instance (FancyResult [[Char]]) where
+  doFancy words = putStr $ LT.unpack $ renderText $ do 
+    if words == [] 
+      then em_ "no results."
+      else do
+        table_ [rows_ "1"] $ mapM (\a->tr_ [] $ td_ [] $ htmlWord a) $ take 1000 words
+        if (drop 1000 words /= []) 
+          then a_ [class_ "", onclick_ "addDropAndRepost(this);"] "More..."
+          else ""
 
 

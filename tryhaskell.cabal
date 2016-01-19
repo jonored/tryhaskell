@@ -17,6 +17,7 @@ data-files:          Imports.hs
                      static/css/fonts/Haskell.ttf
                      static/css/fonts/Haskell.woff
                      static/css/tryhaskell.css
+                     static/css/richconsole.css
                      static/js/jquery.console.js
                      static/js/tryhaskell.js
                      static/js/tryhaskell.pages.js

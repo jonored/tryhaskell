@@ -41,6 +41,12 @@ tryhaskell.pages.list =
 	 '<li>Return all possible words, longest first: <code>anagramAny sysDict "aeelmpx"</code></li>' +
 	 '<li>rot13: <code>Cipher.rot 13 "aeelmpx"</code></li>' +
 	 '</ul>' +
+	 'Dictionaries:<ul>' +
+         '<li>enwikt - english wiktionary titles</li>' +
+         '<li>ukacd - UK advanced cryptics dictionary</li>' +
+         '<li>sowpods - Non-US scrabble dictionary</li>' +
+         '<li>sysDict - /usr/share/bin/dict</li>' +
+         '</ul>' +
 	 '<p>In general, any haskell code that <a href="http://tryhaskell.org/">tryhaskell.org</a> will accept will work here; the anagram and crossword functions return plain lists of strings. There are some examples of fancy queries on the <code>next</code> page.</p>' +
 	 '</div>'
 	},

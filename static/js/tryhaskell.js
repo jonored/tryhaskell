@@ -81,12 +81,13 @@ tryhaskell.preCommandHook = function(line,report){
 // Make the console controller.
 tryhaskell.makeController = function(){
     tryhaskell.controller = $('#console').console({
-        promptLabel: 'λ ',
+        promptLabel: 'λ: ',
         commandValidate: function(line){
             if (line == "") return false;
             else return true;
         },
         commandHandle: function(line,report){
+            $(".jquery-console-prompt-label").html("λ ");
             if(tryhaskell.io === null){
                 if(!tryhaskell.preCommandHook(line,report)){
                     tryhaskell.ajaxCommand(line,report,[]);
@@ -121,7 +122,13 @@ tryhaskell.ajaxCommand = function(line,report,stdin){
         type: 'POST',
         data: args,
         success: function(result){
-            if(result.stdout !== undefined){
+	    if(result.success && result.success.expr!=null && result.success.expr.substring(0,8)=="doFancy "){
+	        tryhaskell.files = result.files;
+		rslt = result.success.stdout;
+		d=$("<div>", {class: "fancy_box", expr: result.success.expr});
+		d.html(rslt);
+		report(d);
+            }else if(result.stdout !== undefined){
                 tryhaskell.files = result.files;
                 result = result.stdout;
                 tryhaskell.io = line;
@@ -223,6 +230,32 @@ tryhaskell.makeGuidSamplesClickable = function() {
         });
     });
 }
+
+function addDropAndRepost(Elem) {
+    var fb = $(Elem).parents(".fancy_box");
+    var expr = fb.attr("expr");
+    expr=expr.replace(/^doFancy \(/,"").replace(/\)$/,"");
+    curSkip = expr.match(/^ *drop ([0-9]*) \$ /);
+    if(!curSkip) {curSkip=0;} else {curSkip=parseInt(curSkip[1]);}
+    curSkip = curSkip+1000;
+    expr=expr.replace(/^ *drop ([0-9]*) \$ /,"");
+    tryhaskell.controller.promptText("drop " + curSkip + " $ " + expr);
+    tryhaskell.controller.inner.click();
+}
+function batshitAnagram(Elem) {
+    var fb = $(Elem).parents(".fancy_box");
+    var expr = fb.attr("expr");
+    expr=expr.replace(/^doFancy \(/,"").replace(/\)$/,"");
+
+    newWord = $(Elem).parents(".word").clone().children().remove().end().text();
+
+
+    newExpr=expr.replace(/\banagram(\w*) (\w*) ("[^"]*")/, "anagram$1 $2 (getHistogram $3)");
+    newExpr=newExpr.replace(/\banagram(\w*) (\w*) \((getHistogram "[^"]*"(( `subHistogram` getHistogram "[^"]*")*))\)/, "anagram$1 $2 ($3 `subHistogram` getHistogram \""+newWord+"\")");
+    tryhaskell.controller.promptText(newExpr);
+    tryhaskell.controller.inner.click();
+}
+
 
 // Display the currently active users
 tryhaskell.activeUsers = function(){
